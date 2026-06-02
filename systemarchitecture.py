@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ST-TCNN System Architecture Diagram</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Urbanist:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0a0f1e;
+            --card-bg: #121829;
+            --border-color: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --cyan-accent: #38bdf8;
+            --indigo-accent: #6366f1;
+            --purple-accent: #a855f7;
+            --emerald-accent: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Urbanist', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        h1 span {
+            color: var(--cyan-accent);
+        }
+
+        p {
+            font-size: 15px;
+            color: var(--text-muted);
+        }
+
+        .diagram-wrapper {
+            position: relative;
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            background-color: #070a13;
+            border-radius: 12px;
+            border: 1px solid #1e293b;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* SVG Vector Styles */
+        .grid-line {
+            stroke: #161e2e;
+            stroke-width: 1;
+        }
+
+        .pipeline-box {
+            fill: none;
+            stroke-dasharray: 6 4;
+            stroke-width: 2;
+        }
+
+        .box-lstm {
+            stroke: var(--indigo-accent);
+        }
+
+        .box-gcn {
+            stroke: var(--purple-accent);
+        }
+
+        .box-attention {
+            stroke: var(--cyan-accent);
+        }
+
+        .node {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .node:hover {
+            filter: drop-shadow(0px 0px 8px var(--glow-color));
+            transform: translateY(-2px);
+        }
+
+        .node-rect {
+            stroke-width: 1.5;
+            rx: 6px;
+        }
+
+        .label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            fill: var(--text-main);
+            pointer-events: none;
+        }
+
+        .sub-label {
+            font-family: 'Urbanist', sans-serif;
+            font-size: 11px;
+            fill: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .arrow {
+            fill: none;
+            stroke-width: 2;
+            marker-end: url(#arrowhead);
+        }
+
+        .arrow-temporal {
+            stroke: var(--indigo-accent);
+        }
+
+        .arrow-spatial {
+            stroke: var(--purple-accent);
+        }
+
+        .arrow-fusion {
+            stroke: var(--cyan-accent);
+        }
+
+        .arrow-dynamic {
+            stroke: var(--emerald-accent);
+            stroke-dasharray: 4 4;
+        }
+
+        .formula-card {
+            margin-top: 20px;
+            background: rgba(30, 41, 59, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .formula-item {
+            font-size: 14px;
+        }
+
+        .formula-item strong {
+            color: var(--cyan-accent);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Instructions for Slide export */
+        .tips {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 13px;
+            color: var(--cyan-accent);
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>ST-TCNN <span>System Architecture</span></h1>
+        <p>Spatio-Temporal Hybrid Framework with Channel Attention for EEG Attention Analysis</p>
+    </header>
+
+    <div class="diagram-wrapper">
+        <svg viewBox="0 0 1000 562" xmlns="http://www.w3.org/2000/svg">
+            <!-- Definitions for markers and filters -->
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#475569" />
+                </marker>
+                <marker id="arrowhead-indigo" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#6366f1" />
+                </marker>
+                <marker id="arrowhead-purple" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#a855f7" />
+                </marker>
+                <marker id="arrowhead-cyan" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#38bdf8" />
+                </marker>
+                <marker id="arrowhead-emerald" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#10b981" />
+                </marker>
+            </defs>
+
+            <!-- Background Grid Structure -->
+            <g class="grid">
+                <line class="grid-line" x1="100" y1="0" x2="100" y2="562" />
+                <line class="grid-line" x1="200" y1="0" x2="200" y2="562" />
+                <line class="grid-line" x1="300" y1="0" x2="300" y2="562" />
+                <line class="grid-line" x1="400" y1="0" x2="400" y2="562" />
+                <line class="grid-line" x1="500" y1="0" x2="500" y2="562" />
+                <line class="grid-line" x1="600" y1="0" x2="600" y2="562" />
+                <line class="grid-line" x1="700" y1="0" x2="700" y2="562" />
+                <line class="grid-line" x1="800" y1="0" x2="800" y2="562" />
+                <line class="grid-line" x1="900" y1="0" x2="900" y2="562" />
+            </g>
+
+            <!-- Pipeline Containers Boundaries -->
+            <!-- Temporal Pipeline Block Boundary -->
+            <rect class="pipeline-box box-lstm" x="40" y="30" width="280" height="400" rx="10" fill="rgba(99, 102, 241, 0.02)" />
+            <text x="55" y="55" font-family="'Space Grotesk'" font-size="14" font-weight="bold" fill="#818cf8">LSTM PIPELINE (Temporal Domain)</text>
+
+            <!-- Spatial Pipeline Block Boundary -->
+            <rect class="pipeline-box box-gcn" x="680" y="30" width="280" height="400" rx="10" fill="rgba(168, 85, 247, 0.02)" />
+            <text x="695" y="55" font-family="'Space Grotesk'" font-size="14" font-weight="bold" fill="#c084fc">GCN PIPELINE (Spatial Domain)</text>
+
+            <!-- ========================================================= -->
+            <!-- PATHWAY A: TEMPORAL SEQUENCE (LSTM) -->
+            <!-- ========================================================= -->
+            
+            <!-- 1. Input Node -->
+            <g class="node" style="--glow-color: var(--indigo-accent);">
+                <rect class="node-rect" x="80" y="80" width="200" height="50" fill="#1e1b4b" stroke="#4f46e5" />
+                <text class="label" x="180" y="102" font-size="13" text-anchor="middle">EEG Time-Series</text>
+                <text class="sub-label" x="180" y="118" text-anchor="middle">Shape: (Batch, 250, 62)</text>
+            </g>
+
+            <!-- Arrow: Input -> LSTM 1 -->
+            <path class="arrow" d="M 180 130 L 180 160" stroke="#6366f1" marker-end="url(#arrowhead-indigo)" />
+
+            <!-- 2. LSTM Block 1 -->
+            <g class="node" style="--glow-color: var(--indigo-accent);">
+                <rect class="node-rect" x="80" y="160" width="200" height="50" fill="#111827" stroke="#312e81" />
+                <text class="label" x="180" y="185" font-size="13" text-anchor="middle">LSTM Layer 1</text>
+                <text class="sub-label" x="180" y="200" text-anchor="middle">64 Hidden Units</text>
+            </g>
+
+            <!-- Arrow: LSTM 1 -> LSTM 2 -->
+            <path class="arrow" d="M 180 210 L 180 240" stroke="#6366f1" marker-end="url(#arrowhead-indigo)" />
+
+            <!-- 3. LSTM Block 2 -->
+            <g class="node" style="--glow-color: var(--indigo-accent);">
+                <rect class="node-rect" x="80" y="240" width="200" height="50" fill="#111827" stroke="#312e81" />
+                <text class="label" x="180" y="265" font-size="13" text-anchor="middle">LSTM Layer 2</text>
+                <text class="sub-label" x="180" y="280" text-anchor="middle">128 Hidden Units</text>
+            </g>
+
+            <!-- Arrow: LSTM 2 -> Self Attention -->
+            <path class="arrow" d="M 180 290 L 180 320" stroke="#6366f1" marker-end="url(#arrowhead-indigo)" />
+
+            <!-- 4. Self Attention Block -->
+            <g class="node" style="--glow-color: var(--indigo-accent);">
+                <rect class="node-rect" x="80" y="320" width="200" height="50" fill="#111827" stroke="#4338ca" />
+                <text class="label" x="180" y="345" font-size="13" text-anchor="middle">Self-Attention</text>
+                <text class="sub-label" x="180" y="360" text-anchor="middle">Query-Key-Value Scaling</text>
+            </g>
+
+            <!-- Arrow: Self Attention -> Dense Representation -->
+            <path class="arrow" d="M 180 370 L 180 400" stroke="#6366f1" marker-end="url(#arrowhead-indigo)" />
+
+            <!-- 5. Temporal Dense Projection -->
+            <g class="node" style="--glow-color: var(--indigo-accent);">
+                <rect class="node-rect" x="80" y="400" width="200" height="50" fill="#111827" stroke="#4f46e5" />
+                <text class="label" x="180" y="425" font-size="13" text-anchor="middle">LSTM Dense Project</text>
+                <text class="sub-label" x="180" y="440" text-anchor="middle">Out Dimension: (Batch, 64)</text>
+            </g>
+
+
+            <!-- ========================================================= -->
+            <!-- PATHWAY B: SPATIAL DE FEATURES (GCN) -->
+            <!-- ========================================================= -->
+
+            <!-- 1. Spatial Feature Input Node -->
+            <g class="node" style="--glow-color: var(--purple-accent);">
+                <rect class="node-rect" x="720" y="80" width="200" height="50" fill="#2e1065" stroke="#7c3aed" />
+                <text class="label" x="820" y="102" font-size="13" text-anchor="middle">DE Features</text>
+                <text class="sub-label" x="820" y="118" text-anchor="middle">Shape: (Batch, 62, 5)</text>
+            </g>
+
+            <!-- Arrow: DE -> GCN Projection -->
+            <path class="arrow" d="M 820 130 L 820 160" stroke="#a855f7" marker-end="url(#arrowhead-purple)" />
+
+            <!-- 2. GCN Initial Projection -->
+            <g class="node" style="--glow-color: var(--purple-accent);">
+                <rect class="node-rect" x="720" y="160" width="200" height="50" fill="#111827" stroke="#581c87" />
+                <text class="label" x="820" y="185" font-size="13" text-anchor="middle">GCN Linear Init</text>
+                <text class="sub-label" x="820" y="200" text-anchor="middle">Projecting Bands to (Batch, 62, 32)</text>
+            </g>
+
+            <!-- Arrow: GCN Init -> GCN Layer 1 -->
+            <path class="arrow" d="M 820 210 L 820 240" stroke="#a855f7" marker-end="url(#arrowhead-purple)" />
+
+            <!-- 3. GCN Layer 1 -->
+            <g class="node" style="--glow-color: var(--purple-accent);">
+                <rect class="node-rect" x="720" y="240" width="200" height="50" fill="#111827" stroke="#581c87" />
+                <text class="label" x="820" y="265" font-size="13" text-anchor="middle">GCN Layer 1</text>
+                <text class="sub-label" x="820" y="280" text-anchor="middle">Topography Convolution (64 Units)</text>
+            </g>
+
+            <!-- Arrow: GCN Layer 1 -> GCN Layer 2 -->
+            <path class="arrow" d="M 820 290 L 820 320" stroke="#a855f7" marker-end="url(#arrowhead-purple)" />
+
+            <!-- 4. GCN Layer 2 -->
+            <g class="node" style="--glow-color: var(--purple-accent);">
+                <rect class="node-rect" x="720" y="320" width="200" height="50" fill="#111827" stroke="#6b21a8" />
+                <text class="label" x="820" y="345" font-size="13" text-anchor="middle">GCN Layer 2</text>
+                <text class="sub-label" x="820" y="360" text-anchor="middle">Topography Convolution (128 Units)</text>
+            </g>
+
+            <!-- Arrow: GCN Layer 2 -> Dense Projection -->
+            <path class="arrow" d="M 820 370 L 820 400" stroke="#a855f7" marker-end="url(#arrowhead-purple)" />
+
+            <!-- 5. Spatial Dense Projection -->
+            <g class="node" style="--glow-color: var(--purple-accent);">
+                <rect class="node-rect" x="720" y="400" width="200" height="50" fill="#111827" stroke="#7c3aed" />
+                <text class="label" x="820" y="425" font-size="13" text-anchor="middle">GCN Dense Project</text>
+                <text class="sub-label" x="820" y="440" text-anchor="middle">Pooled Output: (Batch, 64)</text>
+            </g>
+
+
+            <!-- ========================================================= -->
+            <!-- PATHWAY C: CHANNEL ATTENTION MODULE -->
+            <!-- ========================================================= -->
+
+            <!-- Group box for Attention calculation -->
+            <rect class="pipeline-box box-attention" x="350" y="100" width="280" height="240" rx="10" fill="rgba(56, 189, 248, 0.02)" />
+            <text x="365" y="125" font-family="'Space Grotesk'" font-size="14" font-weight="bold" fill="#0ea5e9">CHANNEL ATTENTION</text>
+
+            <!-- Step 1: Feature Aggregation -->
+            <g class="node" style="--glow-color: var(--cyan-accent);">
+                <rect class="node-rect" x="390" y="150" width="200" height="50" fill="#0c4a6e" stroke="#0284c7" />
+                <text class="label" x="490" y="175" font-size="13" text-anchor="middle">Joint State Aggregator</text>
+                <text class="sub-label" x="490" y="190" text-anchor="middle">Temporal + Spatial Vectors</text>
+            </g>
+
+            <!-- Step 2: Attention Projection -->
+            <g class="node" style="--glow-color: var(--cyan-accent);">
+                <rect class="node-rect" x="390" y="230" width="200" height="50" fill="#111827" stroke="#0369a1" />
+                <text class="label" x="490" y="255" font-size="13" text-anchor="middle">Softmax & Sigmoid</text>
+                <text class="sub-label" x="490" y="270" text-anchor="middle">Generates Scaling Coeff: &beta;</text>
+            </g>
+
+            <!-- Connected Arrows for Attention Input -->
+            <!-- Arrow from Temporal Pipeline (LSTM) to Aggregator -->
+            <path class="arrow-dynamic" d="M 280 425 C 340 425, 340 175, 390 175" stroke="#10b981" marker-end="url(#arrowhead-emerald)" />
+            
+            <!-- Arrow from Spatial Pipeline (GCN) to Aggregator -->
+            <path class="arrow-dynamic" d="M 720 425 C 660 425, 660 175, 590 175" stroke="#10b981" marker-end="url(#arrowhead-emerald)" />
+
+            <!-- Arrow: Aggregator -> Softmax & Sigmoid -->
+            <path class="arrow" d="M 490 200 L 490 230" stroke="#38bdf8" marker-end="url(#arrowhead-cyan)" />
+
+
+            <!-- ========================================================= -->
+            <!-- PATHWAY D: DECISION FUSION & CLASSIFIER -->
+            <!-- ========================================================= -->
+
+            <!-- Beta Multiplier (Temporal Weighting Node) -->
+            <g class="node" style="--glow-color: var(--cyan-accent);">
+                <circle cx="180" cy="490" r="18" fill="#070a13" stroke="#38bdf8" stroke-width="1.5" />
+                <text x="180" y="494" font-family="'Space Grotesk'" font-size="14" font-weight="bold" fill="#38bdf8" text-anchor="middle">&beta;</text>
+            </g>
+            <!-- Direct connections down to Beta -->
+            <path class="arrow" d="M 180 450 L 180 472" stroke="#6366f1" marker-end="url(#arrowhead-indigo)" />
+            <!-- Path from attention output to Beta multiplier -->
+            <path class="arrow-dynamic" d="M 390 255 C 320 255, 320 490, 198 490" stroke="#10b981" marker-end="url(#arrowhead-emerald)" />
+
+            <!-- 1-Beta Multiplier (Spatial Weighting Node) -->
+            <g class="node" style="--glow-color: var(--cyan-accent);">
+                <circle cx="820" cy="490" r="18" fill="#070a13" stroke="#38bdf8" stroke-width="1.5" />
+                <text x="820" y="494" font-family="'Space Grotesk'" font-size="12" font-weight="bold" fill="#38bdf8" text-anchor="middle">1-&beta;</text>
+            </g>
+            <!-- Direct connections down to 1-Beta -->
+            <path class="arrow" d="M 820 450 L 820 472" stroke="#a855f7" marker-end="url(#arrowhead-purple)" />
+            <!-- Path from attention output to 1-Beta multiplier -->
+            <path class="arrow-dynamic" d="M 590 255 C 680 255, 680 490, 802 490" stroke="#10b981" marker-end="url(#arrowhead-emerald)" />
+
+            <!-- Concatenation Block -->
+            <g class="node" style="--glow-color: var(--emerald-accent);">
+                <rect class="node-rect" x="390" y="380" width="200" height="45" fill="#064e3b" stroke="#059669" />
+                <text class="label" x="490" y="407" font-size="13" text-anchor="middle">Feature Fusion Block</text>
+                <text class="sub-label" x="490" y="418" text-anchor="middle">Concatenates: [&beta;&bull;H_t , (1-&beta;)&bull;H_s]</text>
+            </g>
+
+            <!-- Arrow from Beta multiplier up to Concatenation Block -->
+            <path class="arrow-fusion" d="M 180 508 C 180 535, 350 402, 390 402" stroke="#38bdf8" marker-end="url(#arrowhead-cyan)" />
+
+            <!-- Arrow from 1-Beta multiplier up to Concatenation Block -->
+            <path class="arrow-fusion" d="M 820 508 C 820 535, 630 402, 590 402" stroke="#38bdf8" marker-end="url(#arrowhead-cyan)" />
+
+            <!-- Arrow from Concatenation -> Output Prediction Layers -->
+            <path class="arrow" d="M 490 425 L 490 455" stroke="#10b981" marker-end="url(#arrowhead-emerald)" />
+
+            <!-- Output Classification Prediction layer -->
+            <g class="node" style="--glow-color: var(--emerald-accent);">
+                <rect class="node-rect" x="390" y="455" width="200" height="50" fill="#111827" stroke="#059669" />
+                <text class="label" x="490" y="480" font-size="13" text-anchor="middle">Dense & Output Softmax</text>
+                <text class="sub-label" x="490" y="495" text-anchor="middle">Classifies: 0, 1, or 2 (Output States)</text>
+            </g>
+        </svg>
+    </div>
+
+    <div class="formula-card">
+        <div class="formula-item">
+            <strong>Beta weight (&beta;):</strong> Calculates balance between temporal (LSTM) and spatial (GCN) context signals.
+        </div>
+        <div class="formula-item">
+            <strong>Attention Index:</strong> Computed via relative band output matching: $Attention = \frac{\beta_{band}}{\alpha_{band}}$.
+        </div>
+    </div>
+
+    <div class="tips">
+        💡 Hover over nodes to highlight features. Double-click "Preview" to show in full screen before screenshotting for slides!
+    </div>
+</div>
+
+</body>
+</html>
